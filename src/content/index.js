@@ -68,12 +68,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 request.sample.forEach(({ datapointId, fieldName}) => {
                     const datapoint = `${index}${datapointId.slice(1)}`
                     let fieldValue = element.querySelector(`[data-point="${datapoint}"]`)
-                    if (fieldValue.tagName === "IMG") {
-                        fields[fieldName] = fieldValue.src; 
-                    } else if (fieldValue.className === "info-url") {
-                        fields[fieldName] = fieldValue.getAttribute('data-url'); 
+                    if (fieldValue) {
+                        if (fieldValue.tagName === "IMG") {
+                            fields[fieldName] = fieldValue.src;
+
+                        } else if (fieldValue.className === "info-url") {
+                            fields[fieldName] = fieldValue.getAttribute('data-url');
+                        } else {
+                            fields[fieldName] = fieldValue.textContent.trim();
+                        }
                     } else { 
-                        fields[fieldName] = fieldValue.textContent.trim();
+                        fields[fieldName] = "----"
                     }
                 })
                 return fields
@@ -102,7 +107,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
     if (request.message === "getMappedContent") { 
         sendResponse(mapContent);
-        mapContent = {};
     }
     return true;
 });
