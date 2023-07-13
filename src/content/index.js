@@ -1,14 +1,14 @@
 const listKeywords = ["result-list", "results-list", "jobs-list", "list"];
-const listTags = ["ul", "ol", "div"]
+const listTags = ["ul", "ol", "div"];
 
 const collectData = (list) => {
     const data = [];
     const searchResultContainer = Array.from(list.children);
-    searchResultContainer.forEach((element) => {
+    searchResultContainer.forEach((element, index) => {
         const avatar = element.querySelector(".presence-entity__image") ? element.querySelector(".presence-entity__image").src : null;
         const nameLink = element.querySelector(".entity-result__title-text").children[0];
         const profileURL = element.querySelector(".entity-result__title-text").children[0].href;
-        const name = nameLink.querySelector(`span[aria-hidden="true"]`).textContent;
+        const name = nameLink.querySelector("span[aria-hidden='true']")?.textContent;
         const summary = element.querySelector(".entity-result__summary") ? element.querySelector(".entity-result__summary").textContent.trim():null;
         const jobTitle = element.querySelector(".entity-result__primary-subtitle") ? element.querySelector(".entity-result__primary-subtitle").textContent.trim() : null;
         const currentLocation = element.querySelector(".entity-result__secondary-subtitle") ? element.querySelector(".entity-result__secondary-subtitle").textContent.trim() : null;
@@ -71,7 +71,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     if (fieldValue) {
                         if (fieldValue.tagName === "IMG") {
                             fields[fieldName] = fieldValue.src;
-
                         } else if (fieldValue.className === "info-url") {
                             fields[fieldName] = fieldValue.getAttribute('data-url');
                         } else {
@@ -102,10 +101,57 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             highLightListElements(list.children, index);
         }
     }
+    if (request.message === "multiPage") {
+        // console.log({ message: "running multi page" });
+        if (localStorage.getItem("allPageContent")) { 
+            localStorage.setItem("allPageContent", "");
+        }
+        const pagination = Array.from(document.querySelectorAll('ul, ol, div')).filter(listElement => {
+            return Array.from(listElement.attributes).some((attribute) => attribute.value.includes('pages'))
+        })
+        console.log(sample)
+        console.log(pagination[0].children);
+        let pageNumber = 1
+        //1. collect data from current page and put it localStorage
+        let list = request.sample[0].listId;
+        const data = Array.from(document.querySelector(`[list-id="${list}"]`).children).map((element, index) => {
+            let fields = {};
+            request.sample.forEach(({ datapointId, fieldName }) => {
+                const datapoint = `${index}${datapointId.slice(1)}`
+                let fieldValue = element.querySelector(`[data-point="${datapoint}"]`)
+                if (fieldValue) {
+                    if (fieldValue.tagName === "IMG") {
+                        fields[fieldName] = fieldValue.src;
+                    } else if (fieldValue.className === "info-url") {
+                        fields[fieldName] = fieldValue.getAttribute('data-url');
+                    } else {
+                        fields[fieldName] = fieldValue.textContent.trim();
+                    }
+                } else {
+                    fields[fieldName] = "----"
+                }
+            })
+            return fields
+        })
+        if (localStorage.getItem("allPageContent")) {
+            const pagesData = JSON.parse(localStorage.getItem("allPageContent"));
+            pagesData.push({ pageNumber: data });
+            console.log({ data, message: "stored current page in LS" });
+
+        } else { 
+            localStoragesetItem('allPageContent', JSON.stringify({ pageNumber: data }));
+            console.log({ data, message: "stored new data in ls" });
+            
+        }
+        //2. triggering for 5 buttons.
+
+        //3. Get all the contents once buttons are clicked and send it as response.
+        
+    }
     if (request.message === "cancelMapData") {
         location.reload()
     }
-    if (request.message === "getMappedContent") { 
+    if (request.message === "getMappedContent") {
         sendResponse(mapContent);
     }
     return true;

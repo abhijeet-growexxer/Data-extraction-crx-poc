@@ -7,7 +7,7 @@ import {
   AimOutlined,
 } from "@ant-design/icons";
 
-const MapInputs = ({ tabDetails, viewMapHandler, currentPageMapHandler }) => {
+const MapInputs = ({ tabDetails, viewMapHandler, currentPageMapHandler, allPageMapHandler }) => {
     const [inputElements, setInputElements] = useState([]);
     const [sample, setSample] = useState([])
     const [messageApi, contextHolder] = message.useMessage();
@@ -63,7 +63,6 @@ const MapInputs = ({ tabDetails, viewMapHandler, currentPageMapHandler }) => {
         viewMapHandler(inputElements, sample);
         resetInputs();
         messageApi.success("Card Created!");
-        console.log("card created")
     }
 
     const removeInput = (id) => {
@@ -93,8 +92,18 @@ const MapInputs = ({ tabDetails, viewMapHandler, currentPageMapHandler }) => {
         <Button
           icon={<AimOutlined />}
           style={{ marginTop: "10px" }}
-          onClick={()=>currentPageMapHandler(sample)}
-        />
+          onClick={() => currentPageMapHandler(sample)}
+        >
+            Current
+        </Button>
+        
+        <Button
+          icon={<AimOutlined />}
+          style={{ marginTop: "10px" }}
+          onClick={() => allPageMapHandler(sample)}
+        >
+            All
+        </Button>
         <Button
           icon={<PlusOutlined />}
           style={{ marginTop: "10px" }}

@@ -31,7 +31,7 @@ const Header = () => {
         }
         const { origin, geoUrn, network, keywords } = variables;
         const geoUrnJoined = geoUrn ? JSON.parse(geoUrn).join(','): "";
-        const networkJoined = JSON.parse(network).join(',')
+        const networkJoined = network ? JSON.parse(network).join(',') : "";
         keywordValue = encodeURI(keywords);
         geoUrnValues = geoUrn ? `,(key:geoUrn,value:List(${geoUrnJoined}))`: "";
         networkValues = network ? `,(key:network,value:List(${networkJoined}))`: "";
@@ -104,6 +104,7 @@ const Header = () => {
         let currentPage = 0;
         let totalPages = 0;
         await chrome.tabs.sendMessage(tabDetails.id, { message: 'getPageDetails' }).then((response) => {
+            console.log(response)
             currentPage = response.currentPage
             totalPages = response.totalPages
         });
@@ -134,10 +135,9 @@ const Header = () => {
     const viewMappedData = (inputElements) => {
         const info = {};
         const infoArray = [];
-        // if (flag === "map") {
-        //     infoArray = [...data.data];
-        // }
-        
+        if (flag === "map") {
+            infoArray = [...data.data];
+        }
         inputElements.map((element) => { 
             return info[element.defaultSelectValue] = element.content 
         })
@@ -145,7 +145,6 @@ const Header = () => {
         setData((prevState) => {
             return { page: "--", data: infoArray };
         });
-        console.log({com: "Header", data, info, infoArray})
     }
 
     const getMapInputs = (sample) => {
@@ -167,7 +166,7 @@ const Header = () => {
             <FilterOutlined /> Page Settings
           </span>
         ),
-        key: "1",
+        key: "0",
         children: (
             <PageSettings
                 onClickHandler={extractFromPages}
@@ -184,7 +183,7 @@ const Header = () => {
             <FileDoneOutlined /> View Data
           </span>
         ),
-        key: "0",
+        key: "1",
         children: <ViewPage pages={data} />,
       },
     ];
