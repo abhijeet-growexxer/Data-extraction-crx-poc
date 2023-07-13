@@ -42,6 +42,7 @@ const MapInputs = ({ tabDetails, viewMapHandler, currentPageMapHandler }) => {
 
     const getMappedData = async (id) => {
         await chrome.tabs.sendMessage(tabDetails.id, { message: "getMappedContent" }).then((response) => {
+          console.log('response000', response);
             let updatedElements = [...inputElements];
             let dupSample = [...sample];
             for (const element of updatedElements) {
@@ -51,6 +52,9 @@ const MapInputs = ({ tabDetails, viewMapHandler, currentPageMapHandler }) => {
                         datapointId: response.dataPoint,
                         fieldName: element.defaultSelectValue,
                     });
+                    console.log('upSample000', dupSample);
+                    localStorage.setItem('configOfData', JSON.stringify(dupSample));
+                    //console.log(localStorage.getItem("configOfData"));
                     setSample(dupSample);
                     element.content = response.content;
                 }
@@ -94,7 +98,9 @@ const MapInputs = ({ tabDetails, viewMapHandler, currentPageMapHandler }) => {
           icon={<AimOutlined />}
           style={{ marginTop: "10px" }}
           onClick={()=>currentPageMapHandler(sample)}
-        />
+        >
+          Aim All
+        </Button>
         <Button
           icon={<PlusOutlined />}
           style={{ marginTop: "10px" }}

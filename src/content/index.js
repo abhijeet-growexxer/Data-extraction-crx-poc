@@ -1,3 +1,5 @@
+import { async } from "regenerator-runtime";
+
 const listKeywords = ["result-list", "results-list", "jobs-list", "list"];
 const listTags = ["ul", "ol", "div"]
 
@@ -46,10 +48,61 @@ const extractData = () => {
     }
 };
 
+const inspectMode = async () => {
+    setInspect(false);
+    await chrome.tabs.sendMessage(tabDetails.id, { message: "mapData" });
+};
+
+const nextPageData = async () => {
+    const listElements = Array.from(document.querySelectorAll('ul, ol, div')).filter(listElement => {
+        return Array.from(listElement.attributes).some((attribute) => attribute.value.includes('list'))
+    })
+    for (const [index, list] of listElements.entries()) {
+        list.setAttribute('list-id', index);
+        Array.from(list.children).forEach((el, i) => {
+            el.setAttribute("data-point",i)
+        })
+        highLightListElements(list.children, index);
+    }
+    const pageElements = document.querySelectorAll('.artdeco-pagination__pages > li');
+    for (const pageBtn of pageElements) {
+        const pageNumber = pageBtn.getAttribute('data-test-pagination-page-btn');
+        const btnSpanElem = pageBtn.querySelector('button');
+        btnSpanElem.setAttribute('page-point', pageNumber);
+    }
+}
+
+const getDataByMarkers = async (dupSample) => {
+    console.log('dupSample_', dupSample);
+    let list = dupSample.listId;
+    const data = Array.from(document.querySelector(`[list-id="${list}"]`).children).map((element, index) => {
+        let fields = {};
+        let blaBla = [dupSample];
+        blaBla.forEach(({ datapointId, fieldName}) => {
+            const datapoint = `${index}${datapointId.slice(1)}`
+            let fieldValue = element.querySelector(`[data-point="${datapoint}"]`)
+            if (fieldValue) {
+                if (fieldValue.tagName === "IMG") {
+                    fields[fieldName] = fieldValue.src;
+                } else if (fieldValue.className === "info-url") {
+                    fields[fieldName] = fieldValue.getAttribute('data-url');
+                } else {
+                    fields[fieldName] = fieldValue.textContent.trim();
+                }
+            } else { 
+                fields[fieldName] = "----"
+            }
+        })
+        return fields
+    });
+    console.log('datadata_', data);
+    return data;
+}
 
 
 let mapContent = {};
 let listElement = "";
+let contents;
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.message === "Current") {
@@ -63,7 +116,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             console.log("error: field values not from the same list")
         } else {
             let list = request.sample[0].listId;
-            const data = Array.from(document.querySelector(`[list-id="${list}"]`).children).map((element, index) => {
+            let data = Array.from(document.querySelector(`[list-id="${list}"]`).children).map((element, index) => {
                 let fields = {};
                 request.sample.forEach(({ datapointId, fieldName}) => {
                     const datapoint = `${index}${datapointId.slice(1)}`
@@ -83,6 +136,26 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 })
                 return fields
             });
+
+            //for (let index = 2; index < 5; index++) {
+                
+                const pageBtn = document.querySelector(`[page-point="2"]`);
+                pageBtn.click();
+
+                setTimeout(() => {
+                    nextPageData();
+                    const datapointId = request.configDataPointId;
+                    console.log('datapointId___', datapointId);
+                    data = getDataByMarkers(datapointId);
+                    console.log('datal', data);
+
+                    //sendResponse({page: "Mapped from Current Page", data});
+                    
+                    // 0,0,0,1,0,0,0,0,0,0,1,0
+                    //console.log('mapContent_nextPage', mapContent);
+                }, 1800);
+            //}
+            
             sendResponse({page: "Mapped from Current Page", data})
         }
     }
@@ -91,25 +164,45 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         sendResponse({ totalPages, currentPage });
     }
     if (request.message === "mapData") {
+        /**
+         * Read current page config from local storage, Same for data
+         */
         const listElements = Array.from(document.querySelectorAll('ul, ol, div')).filter(listElement => {
             return Array.from(listElement.attributes).some((attribute) => attribute.value.includes('list'))
         })
         for (const [index, list] of listElements.entries()) {
             list.setAttribute('list-id', index);
-            Array.from(list.children).forEach((el, i) => { 
+            Array.from(list.children).forEach((el, i) => {
                 el.setAttribute("data-point",i)
             })
             highLightListElements(list.children, index);
+        }
+        const pageElements = document.querySelectorAll('.artdeco-pagination__pages > li');
+        for (const pageBtn of pageElements) {
+            const pageNumber = pageBtn.getAttribute('data-test-pagination-page-btn');
+            const btnSpanElem = pageBtn.querySelector('button');
+            btnSpanElem.setAttribute('page-point', pageNumber);
         }
     }
     if (request.message === "cancelMapData") {
         location.reload()
     }
-    if (request.message === "getMappedContent") { 
+    if (request.message === "getMappedContent") {
+        /**
+         * Store concated data in local storage, update config too, [page number], current page + 1
+         */
         sendResponse(mapContent);
     }
     return true;
 });
+
+// chrome.tabs.onUpdated.addListener( function (tabId, changeInfo, tab) {
+//     if (changeInfo.status == 'complete') {
+  
+//       // do your things
+  
+//     }
+// })
 
 const highLightListElements = (cards, listId) => {
     contents = []

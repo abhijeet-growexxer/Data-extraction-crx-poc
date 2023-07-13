@@ -1,0 +1,125 @@
+Add Multipage button
+Initially give range for pages (text box - 0-10)
+Find pagination
+onclick event => get the number of pages and find those numbers in pagination buttons.
+Get links from these pages 
+Loop through these links and get document.innerHTML.
+uderstand the mapping inputs are taken and passed to the reactjs.
+Put List findout code inside a function and execute it inside this loop. (At this stage you will get all the markers coordinates)
+Card1: 0,0,0,1,0,0,0,0,0,0,0 => Card2: 1,0,0,1,0,0,0,0,0,0,1,0 => card3: 2,0,0,1,0,0,0,0,0,0,1,0 Pattern for marked fields.
+Collect [1:{},2:{}]
+
+background.js : Line no 14 : at the end .. , windowId: chrome.windows.WINDOW_ID_CURRENT
+----------------------------------------------------------------------------------------------
+
+<Radio.Button value="Multipage">Multipage</Radio.Button>
+
+else if (config.extractPage === "Multipage") {
+            console.log('totalPages', totalPages);
+            const multiPageData = await getAllPageData(totalPages);
+            console.log('multiPageData0', multiPageData);
+            content = "Loaded from multi page"
+        } 
+        
+        const extractMultiPage = async () => {
+    await chrome.tabs.sendMessage(tabDetails.id, {
+      message: "extractMultiPageData",
+    });
+  }
+ 
+<Button
+style={{ marginLeft: "10px", marginTop: "10px" }}
+onClick={extractMultiPage}
+>
+Multipage
+</Button>
+      
+-------------------------------------------------------------------------------------------
+      
+response11 {listId: 4, dataPoint: '0,0,0,1,0,0,0,0,0,0,1,0', content: 'Saharsh Gupta'}
+inputElements11 [{…}]
+upSample11 [{…}]
+-----------
+response11 {listId: 4, dataPoint: '0,0,0,1,0,1,0', content: 'Software Engineer At Growexx'}
+inputElements11 (2) [{…}, {…}]
+upSample11 (2) [{…}, {…}]
+----------
+sample00 (2) [{…}, {…}]
+tabDetails00 
+response00
+-------------------------------------------------------------------------------------------
+
+artdeco-pagination__pages artdeco-pagination__pages--numbers ______________________________
+
+-------------------------------------------------------------------------------------------
+
+if(request.message === "extractMultiPageData") {
+  // const listElements = Array.from(document.querySelectorAll('ul, ol, div')).filter(listElement => {
+  //     return Array.from(listElement.attributes).some((attribute) => attribute.value.includes('pages'))
+  // })
+
+  // console.log(listElements[0].children);
+  // 0 - 2
+  // artdeco-pagination__pages artdeco-pagination__pages--number // ul
+
+  /**
+    * To do
+    * Read current page config from local storage, Same for data
+    * 
+    */
+  let i=1;
+  for(const pageBtn of listElements[0].children) {
+      const btn = pageBtn.querySelector('button');
+      // console.log('btnnn ', btn);
+      i++;
+      console.log('outer i ', i);
+
+      // const listElements1 = Array.from(document.querySelectorAll('ul, ol, div')).filter(listElement => {
+      //     return Array.from(listElement.attributes).some((attribute) => attribute.value.includes('list'))
+      // })
+      // for (const [index, list] of listElements1.entries()) {
+      //     console.log('inner i ', i);
+      //     list.setAttribute('list-id', index);
+      //     Array.from(list.children).forEach((el, i) => { 
+      //         el.setAttribute("data-point",i)
+      //     })
+      //     // console.log('list.children', list.children);
+      //     // highLightListElements(list.children, index);
+      // }
+      btn.click();
+      // multiPageDataFun();
+      
+      // if(i == btn.innerText) {
+      //     console.log('ijk ', i);
+      //     //multiPageDataFun();
+
+      //     btn.addEventListener('click', e => {alert('test')}); 
+      //     // btn.click();
+      // }
+  }
+}
+
+---------------------------------------------------------------------------------------------
+const getNextPage = async (id) => {
+      await chrome.tabs.sendMessage(tabDetails.id, { message: 'getPageDetails' }).then((response) => {
+        console.log('getPageDetails', response);
+      });
+    };
+    
+mapHandler={getNextPage}
+
+// if (request.message === "goToNextPage") {
+const { totalPages, currentPage } = getCurrentPage();
+// }
+---------------------------------------------------------------------------------------------
+0,0,0,1,0,0,0,0,0,0,1,0
+1,0,0,1,0,0,0,0,0,0,1,0
+2,0,0,1,0,0,0,0,0,0,1,0
+.
+.
+10,0,0,1,0,0,0,0,0,0,1,0
+---------------------------------------------------------------------------------------------
+
+
+
+

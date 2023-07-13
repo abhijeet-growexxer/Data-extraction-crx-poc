@@ -149,7 +149,19 @@ const Header = () => {
     }
 
     const getMapInputs = (sample) => {
-        chrome.tabs.sendMessage(tabDetails.id, { message: "currentPageMapping", sample }).then((response) => {
+        console.log('sample11', sample);
+        console.log('tabDetails11', tabDetails);
+        let configDataPointId = null;
+        if(localStorage.getItem('configOfData')) {
+            configDataPointId = JSON.parse(localStorage.getItem('configOfData'))[0];
+            console.log('configDataPointId', configDataPointId);
+        }
+        chrome.tabs.sendMessage(tabDetails.id, { message: "currentPageMapping", sample, configDataPointId }).then((response) => {
+            console.log({'response.data': response.data });
+            localStorage.setItem('dataOfPage1', JSON.stringify(response.data));
+            console.log(localStorage.getItem("dataOfPage1"));
+            console.log('response11', response);
+
             setData((prevState) => {
                 return { ...response };
             });
