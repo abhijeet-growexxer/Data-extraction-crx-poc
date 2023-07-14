@@ -32,12 +32,47 @@ const PageSettings = ({
 
   return (
     <Spin spinning={isLoading}>
+<<<<<<< Updated upstream
       <Card title="Page Settings">
         <div>Pages: </div>
         <Radio.Group
           defaultValue="Current"
           onChange={changeConfig}
           style={{ marginTop: 10 }}
+=======
+        <Card title="Page Settings">
+            <div>Pages: </div>
+            <Radio.Group
+                defaultValue="Current"
+                onChange={changeConfig}
+                style={{ marginTop: 10 }}
+            >
+            <Radio.Button value="Current">Current</Radio.Button>
+            <Radio.Button value="All">All</Radio.Button>
+            </Radio.Group>
+        </Card>
+        <Button
+            style={{ marginTop: "10px" }}
+            icon={<SettingOutlined />}
+            onClick={() => {
+                onClickHandler(config);
+            }}
+            block
+        >
+            Extract
+        </Button>
+        <Button
+            style={{ marginTop: "10px" }}
+            icon={<SettingOutlined />}
+            onClick={inspectMode}
+        >
+            Inspect mode
+        </Button>
+        <Button
+            style={{ marginLeft: "10px", marginTop: "10px" }}
+            disabled={inspect ? true : false}
+            onClick={cancelInspectMode}
+>>>>>>> Stashed changes
         >
           <Radio.Button value="Current">Current</Radio.Button>
           <Radio.Button value="All">All</Radio.Button>

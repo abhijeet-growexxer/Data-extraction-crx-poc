@@ -177,12 +177,90 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             })
             highLightListElements(list.children, index);
         }
+<<<<<<< Updated upstream
         const pageElements = document.querySelectorAll('.artdeco-pagination__pages > li');
         for (const pageBtn of pageElements) {
             const pageNumber = pageBtn.getAttribute('data-test-pagination-page-btn');
             const btnSpanElem = pageBtn.querySelector('button');
             btnSpanElem.setAttribute('page-point', pageNumber);
         }
+=======
+    }
+    if (request.message === "multiPage") {
+        console.log({ message: "running multi page" });
+        if (localStorage.getItem("allPageContent")) { 
+            localStorage.setItem("allPageContent", "");
+        }
+        // const pageElements = document.querySelectorAll('.artdeco-pagination__pages > li');
+        // console.log('pageElements', pageElements);
+        // for (const pageBtn of pageElements) {
+        //     const pageNumber = pageBtn.getAttribute('data-test-pagination-page-btn');
+        //     const btnSpanElem = pageBtn.querySelector('button');
+        //     btnSpanElem.setAttribute('page-point', pageNumber);
+        //     btnSpanElem.click();
+        // }
+
+        
+        setTimeout(async () => {
+            const pagination = Array.from(document.querySelectorAll('ul, ol, div')).filter(listElement => {
+                return Array.from(listElement.attributes).some((attribute) => attribute.value.includes('pages'))
+            })
+            const {currentPage, totalPages} = await getCurrentPage();
+            console.log('currentPagecurrentPage', currentPage);
+            console.log('totalPagestotalPages', totalPages);
+            for (const pageBtns of pagination[0].children) {
+                setTimeout(() => {
+                    const pageBtn = pageBtns.querySelector('button');
+                    console.log('pageBtn', pageBtn);
+                    console.log('pageBtn.content', pageBtn.content);
+                    // if(currentPage) {
+
+                    // }
+                    console.log(pageBtn);
+                    pageBtn.click();
+                }, 800);
+            }
+        }, 2800);
+        
+        // console.log(sample)
+        // let pageNumber = 1
+        //1. collect data from current page and put it localStorage
+        // console.log('request.sample', request.sample);
+        // let list = request.sample[0].listId;
+        // const data = Array.from(document.querySelector(`[list-id="${list}"]`).children).map((element, index) => {
+        //     let fields = {};
+        //     request.sample.forEach(({ datapointId, fieldName }) => {
+        //         const datapoint = `${index}${datapointId.slice(1)}`
+        //         let fieldValue = element.querySelector(`[data-point="${datapoint}"]`)
+        //         if (fieldValue) {
+        //             if (fieldValue.tagName === "IMG") {
+        //                 fields[fieldName] = fieldValue.src;
+        //             } else if (fieldValue.className === "info-url") {
+        //                 fields[fieldName] = fieldValue.getAttribute('data-url');
+        //             } else {
+        //                 fields[fieldName] = fieldValue.textContent.trim();
+        //             }
+        //         } else {
+        //             fields[fieldName] = "----"
+        //         }
+        //     })
+        //     return fields
+        // })
+        // if (localStorage.getItem("allPageContent")) {
+        //     const pagesData = JSON.parse(localStorage.getItem("allPageContent"));
+        //     pagesData.push({ pageNumber: data });
+        //     console.log({ data, message: "stored current page in LS" });
+
+        // } else { 
+        //     localStoragesetItem('allPageContent', JSON.stringify({ pageNumber: data }));
+        //     console.log({ data, message: "stored new data in ls" });
+            
+        // }
+        //2. triggering for 5 buttons.
+
+        //3. Get all the contents once buttons are clicked and send it as response.
+        
+>>>>>>> Stashed changes
     }
     if (request.message === "cancelMapData") {
         location.reload()

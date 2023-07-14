@@ -187,6 +187,7 @@ const Header = () => {
                 isLoading={loading}
                 viewMapHandler={viewMappedData}
                 currentPageMapHandler={ getMapInputs }
+                allPageMapHandler={ getMapInputs }
             />
         ),
       },
